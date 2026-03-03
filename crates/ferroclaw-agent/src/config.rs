@@ -39,12 +39,10 @@ pub struct AgentConfig {
 
 impl AgentConfig {
     pub fn model_name(&self) -> &str {
-        self.model
-            .as_deref()
-            .unwrap_or_else(|| match self.backend {
-                LlmBackend::OpenAi => "gpt-4o",
-                LlmBackend::Ollama => "llama3",
-            })
+        self.model.as_deref().unwrap_or_else(|| match self.backend {
+            LlmBackend::OpenAi => "gpt-4o",
+            LlmBackend::Ollama => "llama3",
+        })
     }
 
     pub fn max_steps(&self) -> usize {

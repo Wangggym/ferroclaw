@@ -41,9 +41,7 @@ impl MemoryManager {
             .await
             .map_err(MemoryError::Database)?;
 
-        sqlx::migrate!("./migrations")
-            .run(&pool)
-            .await?;
+        sqlx::migrate!("./migrations").run(&pool).await?;
 
         info!("memory database ready: {db_url}");
         Ok(Self { pool })
@@ -54,23 +52,17 @@ impl MemoryManager {
     }
 
     /// Store a new memory entry.
-    pub async fn store(
-        &self,
-        content: &str,
-        embedding: &[f32],
-    ) -> Result<String, MemoryError> {
+    pub async fn store(&self, content: &str, embedding: &[f32]) -> Result<String, MemoryError> {
         let id = Uuid::new_v4().to_string();
         let blob = encode_embedding(embedding);
 
-        sqlx::query(
-            "INSERT INTO memory_entries (id, content, embedding) VALUES (?, ?, ?)",
-        )
-        .bind(&id)
-        .bind(content)
-        .bind(&blob)
-        .execute(&self.pool)
-        .await
-        .map_err(MemoryError::Database)?;
+        sqlx::query("INSERT INTO memory_entries (id, content, embedding) VALUES (?, ?, ?)")
+            .bind(&id)
+            .bind(content)
+            .bind(&blob)
+            .execute(&self.pool)
+            .await
+            .map_err(MemoryError::Database)?;
 
         info!("stored memory entry: {id}");
         Ok(id)
@@ -116,12 +108,11 @@ impl MemoryManager {
 
         // Update accessed_at for retrieved entries
         for (_, ref id, _) in &scored {
-            let _ = sqlx::query(
-                "UPDATE memory_entries SET accessed_at = datetime('now') WHERE id = ?",
-            )
-            .bind(id)
-            .execute(&self.pool)
-            .await;
+            let _ =
+                sqlx::query("UPDATE memory_entries SET accessed_at = datetime('now') WHERE id = ?")
+                    .bind(id)
+                    .execute(&self.pool)
+                    .await;
         }
 
         Ok(scored

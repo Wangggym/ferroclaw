@@ -5,11 +5,13 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use ferroclaw_agent::{AgentConfig, AgentLoop, LlmBackend};
-use ferroclaw_agent::openai::OpenAiProvider;
 use ferroclaw_agent::ollama::OllamaProvider;
+use ferroclaw_agent::openai::OpenAiProvider;
+use ferroclaw_agent::{AgentConfig, AgentLoop, LlmBackend};
 use ferroclaw_core::ConversationHistory;
-use ferroclaw_memory::{EmbeddingProvider, MemoryManager, OpenAiEmbedding, retrieve_context, store_conversation_memory};
+use ferroclaw_memory::{
+    retrieve_context, store_conversation_memory, EmbeddingProvider, MemoryManager, OpenAiEmbedding,
+};
 use ferroclaw_session::SessionManager;
 use ferroclaw_tools::{BashExecTool, ToolRegistry};
 use ratatui::{
@@ -91,9 +93,7 @@ enum MemoryCommands {
         top_k: usize,
     },
     /// Forget (delete) a memory entry by ID
-    Forget {
-        id: String,
-    },
+    Forget { id: String },
     /// Clear all memory entries
     Clear,
 }
@@ -135,7 +135,9 @@ async fn run_agent(message: String, no_memory: bool) -> Result<()> {
 
     // Optionally retrieve memory context
     let memory_ctx = if !no_memory {
-        build_memory_context(&cfg, &message).await.unwrap_or_default()
+        build_memory_context(&cfg, &message)
+            .await
+            .unwrap_or_default()
     } else {
         String::new()
     };
@@ -207,7 +209,7 @@ async fn run_chat(resume_session: Option<String>, no_memory: bool) -> Result<()>
         history.push(ferroclaw_core::Message::system(system));
     } else {
         for msg in existing {
-            use ferroclaw_core::{Role, MessageContent};
+            use ferroclaw_core::{MessageContent, Role};
             let role_str = match msg.role {
                 Role::System => "system",
                 Role::User => "user",
@@ -235,7 +237,10 @@ async fn run_chat(resume_session: Option<String>, no_memory: bool) -> Result<()>
     let mut state = ChatState {
         messages: display,
         input: String::new(),
-        status: format!("Session: {}  (Ctrl-C / Ctrl-D to quit)", session_id.as_str()),
+        status: format!(
+            "Session: {}  (Ctrl-C / Ctrl-D to quit)",
+            session_id.as_str()
+        ),
     };
 
     loop {
@@ -258,7 +263,9 @@ async fn run_chat(resume_session: Option<String>, no_memory: bool) -> Result<()>
 
                         // Retrieve memory context for this turn
                         let memory_ctx = if !no_memory {
-                            build_memory_context(&cfg, &user_msg).await.unwrap_or_default()
+                            build_memory_context(&cfg, &user_msg)
+                                .await
+                                .unwrap_or_default()
                         } else {
                             String::new()
                         };
@@ -274,30 +281,47 @@ async fn run_chat(resume_session: Option<String>, no_memory: bool) -> Result<()>
                         }
 
                         history.push(ferroclaw_core::Message::user(user_msg.clone()));
-                        sm.append_message(&session_id, history.messages.last().unwrap()).await?;
+                        sm.append_message(&session_id, history.messages.last().unwrap())
+                            .await?;
                         state.messages.push(("user".to_owned(), user_msg.clone()));
 
                         // Run agent
                         let model = cfg.model_name().to_owned();
                         let reply_result = match cfg.backend {
-                            LlmBackend::OpenAi => {
-                                match require_openai_key(&cfg) {
-                                    Ok(key) => {
-                                        let provider = OpenAiProvider::new(key, model, cfg.openai_base_url.clone());
-                                        run_with_provider(&provider, &registry, &mut history, cfg.max_steps()).await
-                                    }
-                                    Err(e) => Err(e),
+                            LlmBackend::OpenAi => match require_openai_key(&cfg) {
+                                Ok(key) => {
+                                    let provider = OpenAiProvider::new(
+                                        key,
+                                        model,
+                                        cfg.openai_base_url.clone(),
+                                    );
+                                    run_with_provider(
+                                        &provider,
+                                        &registry,
+                                        &mut history,
+                                        cfg.max_steps(),
+                                    )
+                                    .await
                                 }
-                            }
+                                Err(e) => Err(e),
+                            },
                             LlmBackend::Ollama => {
-                                let provider = OllamaProvider::new(model, cfg.ollama_base_url.clone());
-                                run_with_provider(&provider, &registry, &mut history, cfg.max_steps()).await
+                                let provider =
+                                    OllamaProvider::new(model, cfg.ollama_base_url.clone());
+                                run_with_provider(
+                                    &provider,
+                                    &registry,
+                                    &mut history,
+                                    cfg.max_steps(),
+                                )
+                                .await
                             }
                         };
 
                         match reply_result {
                             Ok(reply) => {
-                                sm.append_message(&session_id, history.messages.last().unwrap()).await?;
+                                sm.append_message(&session_id, history.messages.last().unwrap())
+                                    .await?;
                                 state.messages.push(("assistant".to_owned(), reply.clone()));
 
                                 // Store memory
@@ -310,7 +334,10 @@ async fn run_chat(resume_session: Option<String>, no_memory: bool) -> Result<()>
                                 state.messages.push(("error".to_owned(), e.to_string()));
                             }
                         }
-                        state.status = format!("Session: {}  (Ctrl-C / Ctrl-D to quit)", session_id.as_str());
+                        state.status = format!(
+                            "Session: {}  (Ctrl-C / Ctrl-D to quit)",
+                            session_id.as_str()
+                        );
                     }
 
                     (KeyCode::Backspace, _) => {
@@ -366,7 +393,11 @@ fn draw_chat(f: &mut ratatui::Frame, state: &ChatState) {
         .collect();
 
     let history = List::new(items)
-        .block(Block::default().borders(Borders::ALL).title(" ferroclaw chat "))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(" ferroclaw chat "),
+        )
         .highlight_style(Style::default().add_modifier(Modifier::BOLD));
     f.render_widget(history, chunks[0]);
 
@@ -377,8 +408,7 @@ fn draw_chat(f: &mut ratatui::Frame, state: &ChatState) {
     f.render_widget(input, chunks[1]);
 
     // Status bar
-    let status = Paragraph::new(state.status.as_str())
-        .style(Style::default().fg(Color::DarkGray));
+    let status = Paragraph::new(state.status.as_str()).style(Style::default().fg(Color::DarkGray));
     f.render_widget(status, chunks[2]);
 }
 
@@ -507,8 +537,9 @@ async fn run_memory(action: MemoryCommands) -> Result<()> {
                 println!("{:<36}  {:<20}  Content", "ID", "Created");
                 println!("{}", "-".repeat(80));
                 for (id, content, created) in entries {
-                    let preview = if content.len() > 40 {
-                        format!("{}…", &content[..40])
+                    let preview = if content.chars().count() > 40 {
+                        let cut: String = content.chars().take(40).collect();
+                        format!("{cut}…")
                     } else {
                         content.clone()
                     };

@@ -1,5 +1,5 @@
-use async_trait::async_trait;
 use crate::error::MemoryError;
+use async_trait::async_trait;
 
 pub const OPENAI_EMBEDDING_DIM: usize = 1536; // text-embedding-3-small
 

@@ -66,10 +66,10 @@ P1-H: CLI 命令收尾（onboard / chat TUI，依赖 P1-E + P1-G）
 
 > OpenClaw 参考：`src/agents/pi-embedded-messaging.ts`
 
-- [ ] 创建 `crates/ferroclaw-core/`，加入 workspace members
-- [ ] 定义 `Message`、`Role`、`MessageContent`、`ToolCall`、`ToolResult`
-- [ ] 定义 `SessionId`（newtype），`ConversationHistory`
-- [ ] 定义 `FerroError`（`thiserror`）
+- [x] 创建 `crates/ferroclaw-core/`，加入 workspace members
+- [x] 定义 `Message`、`Role`、`MessageContent`、`ToolCall`、`ToolResult`
+- [x] 定义 `SessionId`（newtype），`ConversationHistory`
+- [x] 定义 `FerroError`（`thiserror`）
 
 ---
 
@@ -80,15 +80,15 @@ P1-H: CLI 命令收尾（onboard / chat TUI，依赖 P1-E + P1-G）
 可拆分为 3 个并行子任务（B1 必须先完成，B2/B3 可并行）：
 
 **B1：LlmProvider trait + config**（不可拆分，B2/B3 的前提）
-- [ ] 创建 `crates/ferroclaw-agent/`
-- [ ] `LlmProvider` trait：`complete(messages, tools, opts) → impl Stream<Token>`
-- [ ] config 结构：从 `~/.config/ferroclaw/config.toml` 读取（`dotenvy` + `serde`）
+- [x] 创建 `crates/ferroclaw-agent/`
+- [x] `LlmProvider` trait：`complete(messages, tools, opts) → impl Stream<Token>`
+- [x] config 结构：从 `~/.config/ferroclaw/config.toml` 读取（`dotenvy` + `serde`）
 
 **B2：OpenAI 实现**（B1 完成后可与 B3 并行）
-- [ ] SSE streaming（`reqwest`），tool call 格式解析
+- [x] SSE streaming（`reqwest`），tool call 格式解析
 
 **B3：Ollama 实现**（B1 完成后可与 B2 并行）
-- [ ] 与 OpenAI 格式兼容，配置 base_url
+- [x] 与 OpenAI 格式兼容，配置 base_url
 
 ---
 
@@ -96,9 +96,9 @@ P1-H: CLI 命令收尾（onboard / chat TUI，依赖 P1-E + P1-G）
 
 > OpenClaw 参考：`src/agents/tool-policy.ts`
 
-- [ ] 创建 `crates/ferroclaw-tools/`
-- [ ] `Tool` trait：`name() / description() / input_schema() → Value / execute(input, ctx) → ToolResult`
-- [ ] `ToolRegistry`：注册 + 按名查找
+- [x] 创建 `crates/ferroclaw-tools/`
+- [x] `Tool` trait：`name() / description() / input_schema() → Value / execute(input, ctx) → ToolResult`
+- [x] `ToolRegistry`：注册 + 按名查找
 
 ---
 
@@ -106,11 +106,11 @@ P1-H: CLI 命令收尾（onboard / chat TUI，依赖 P1-E + P1-G）
 
 > OpenClaw 参考：`src/agents/bash-tools.ts`、`src/agents/bash-tools.exec.ts`
 
-- [ ] `tokio::process::Command` 执行，异步等待
-- [ ] 超时控制（默认 30s，可配置）
-- [ ] stdout + stderr 合并输出，超 10KB 截断
-- [ ] 危险命令检测（`rm -rf /`、`sudo` 等）打印警告
-- [ ] 注册到 `ToolRegistry`
+- [x] `tokio::process::Command` 执行，异步等待
+- [x] 超时控制（默认 30s，可配置）
+- [x] stdout + stderr 合并输出，超 10KB 截断
+- [x] 危险命令检测（`rm -rf /`、`sudo` 等）打印警告
+- [x] 注册到 `ToolRegistry`
 
 ---
 
@@ -118,11 +118,11 @@ P1-H: CLI 命令收尾（onboard / chat TUI，依赖 P1-E + P1-G）
 
 > OpenClaw 参考：`src/agents/pi-embedded-subscribe.handlers.tools.ts`
 
-- [ ] Tool call 循环：LLM 返回 `tool_use` → 执行 → 追加结果 → 继续调用，直到纯文本回复
-- [ ] 最大步数限制（默认 20 步）
-- [ ] 实时打印每步：`[tool] bash_exec: ls -la`
-- [ ] System prompt 中注入工具描述（JSON Schema）
-- [ ] `ferroclaw agent -m "..."` 命令（单次，streaming 输出）
+- [x] Tool call 循环：LLM 返回 `tool_use` → 执行 → 追加结果 → 继续调用，直到纯文本回复
+- [x] 最大步数限制（默认 20 步）
+- [x] 实时打印每步：`[tool] bash_exec: ls -la`
+- [x] System prompt 中注入工具描述（JSON Schema）
+- [x] `ferroclaw agent -m "..."` 命令（单次，streaming 输出）
 
 ---
 
@@ -130,10 +130,10 @@ P1-H: CLI 命令收尾（onboard / chat TUI，依赖 P1-E + P1-G）
 
 > OpenClaw 参考：`src/gateway/session-utils.ts`
 
-- [ ] 创建 `crates/ferroclaw-session/`
-- [ ] SQLite schema（`sqlx` migrate）：`sessions` + `messages` 两张表
-- [ ] `SessionManager`：创建 session、追加消息、加载历史（返回 `Vec<Message>`）
-- [ ] `ferroclaw sessions list / clear` 命令
+- [x] 创建 `crates/ferroclaw-session/`
+- [x] SQLite schema（`sqlx` migrate）：`sessions` + `messages` 两张表
+- [x] `SessionManager`：创建 session、追加消息、加载历史（返回 `Vec<Message>`）
+- [x] `ferroclaw sessions list / clear` 命令
 
 ---
 

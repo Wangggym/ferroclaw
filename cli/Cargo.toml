@@ -13,3 +13,7 @@ clap.workspace = true
 tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+ferroclaw-core.workspace = true
+ferroclaw-agent.workspace = true
+ferroclaw-tools.workspace = true
+ferroclaw-session.workspace = true

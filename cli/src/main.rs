@@ -504,7 +504,7 @@ async fn run_sessions(action: SessionCommands) -> Result<()> {
             if sessions.is_empty() {
                 println!("No sessions.");
             } else {
-                println!("{:<36}  {:<20}  {}", "ID", "Updated", "Title");
+                println!("{:<36}  {:<20}  Title", "ID", "Updated");
                 println!("{}", "-".repeat(70));
                 for (id, title, updated) in sessions {
                     println!(

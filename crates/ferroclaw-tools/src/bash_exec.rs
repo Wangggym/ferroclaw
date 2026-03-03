@@ -57,10 +57,7 @@ fn truncate(s: String, max: usize) -> String {
     if s.len() <= max {
         s
     } else {
-        format!(
-            "{}\n… [output truncated at {max} bytes]",
-            &s[..max]
-        )
+        format!("{}\n… [output truncated at {max} bytes]", &s[..max])
     }
 }
 
@@ -101,9 +98,7 @@ impl Tool for BashExecTool {
             })?
             .to_owned();
 
-        let timeout_secs = input["timeout_secs"]
-            .as_u64()
-            .unwrap_or(self.timeout_secs);
+        let timeout_secs = input["timeout_secs"].as_u64().unwrap_or(self.timeout_secs);
 
         check_dangerous(&command);
 
@@ -116,13 +111,10 @@ impl Tool for BashExecTool {
         }
 
         let run = async {
-            let output = cmd
-                .output()
-                .await
-                .map_err(|e| FerroError::ToolExecution {
-                    tool: "bash_exec".into(),
-                    message: e.to_string(),
-                })?;
+            let output = cmd.output().await.map_err(|e| FerroError::ToolExecution {
+                tool: "bash_exec".into(),
+                message: e.to_string(),
+            })?;
 
             let mut combined = String::new();
             combined.push_str(&String::from_utf8_lossy(&output.stdout));

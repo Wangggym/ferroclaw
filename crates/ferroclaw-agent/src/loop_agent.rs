@@ -14,11 +14,7 @@ pub struct AgentLoop<'a, P: LlmProvider> {
 }
 
 impl<'a, P: LlmProvider> AgentLoop<'a, P> {
-    pub fn new(
-        provider: &'a P,
-        registry: &'a ToolRegistry,
-        max_steps: usize,
-    ) -> Self {
+    pub fn new(provider: &'a P, registry: &'a ToolRegistry, max_steps: usize) -> Self {
         Self {
             provider,
             registry,
@@ -33,17 +29,11 @@ impl<'a, P: LlmProvider> AgentLoop<'a, P> {
     }
 
     /// Run the loop and return the final text response.
-    pub async fn run(
-        &self,
-        history: &mut ConversationHistory,
-    ) -> Result<String, FerroError> {
+    pub async fn run(&self, history: &mut ConversationHistory) -> Result<String, FerroError> {
         let tools = self.registry.schemas();
 
         for step in 0..self.max_steps {
-            let response = self
-                .provider
-                .complete(&history.messages, &tools)
-                .await?;
+            let response = self.provider.complete(&history.messages, &tools).await?;
 
             if response.is_tool_call() {
                 let calls = response.tool_calls.clone();

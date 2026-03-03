@@ -234,9 +234,7 @@ impl LlmProvider for OpenAiProvider {
         if !resp.status().is_success() {
             let status = resp.status();
             let body = resp.text().await.unwrap_or_default();
-            return Err(FerroError::LlmProvider(format!(
-                "HTTP {status}: {body}"
-            )));
+            return Err(FerroError::LlmProvider(format!("HTTP {status}: {body}")));
         }
 
         let data: ChatResponse = resp

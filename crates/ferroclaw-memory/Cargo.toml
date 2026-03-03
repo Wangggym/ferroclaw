@@ -13,3 +13,8 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+reqwest = { workspace = true, features = ["json"] }
+sqlx = { workspace = true, features = ["runtime-tokio-rustls", "sqlite", "migrate", "chrono"] }
+async-trait = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }

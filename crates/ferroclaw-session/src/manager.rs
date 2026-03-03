@@ -75,15 +75,13 @@ impl SessionManager {
         };
         let content = serde_json::to_string(&msg.content).map_err(FerroError::Serialization)?;
 
-        sqlx::query(
-            "INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)",
-        )
-        .bind(session_id.as_str())
-        .bind(role)
-        .bind(&content)
-        .execute(&self.pool)
-        .await
-        .map_err(|e| FerroError::Session(e.to_string()))?;
+        sqlx::query("INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)")
+            .bind(session_id.as_str())
+            .bind(role)
+            .bind(&content)
+            .execute(&self.pool)
+            .await
+            .map_err(|e| FerroError::Session(e.to_string()))?;
 
         // Update session timestamp
         sqlx::query("UPDATE sessions SET updated_at = datetime('now') WHERE id = ?")
@@ -96,10 +94,7 @@ impl SessionManager {
     }
 
     /// Load all messages for a session.
-    pub async fn load_history(
-        &self,
-        session_id: &SessionId,
-    ) -> Result<Vec<Message>, FerroError> {
+    pub async fn load_history(&self, session_id: &SessionId) -> Result<Vec<Message>, FerroError> {
         let rows = sqlx::query_as::<_, (String, String)>(
             "SELECT role, content FROM messages WHERE session_id = ? ORDER BY id ASC",
         )
@@ -115,14 +110,10 @@ impl SessionManager {
                 "user" => Role::User,
                 "assistant" => Role::Assistant,
                 "tool" => Role::Tool,
-                other => {
-                    return Err(FerroError::Session(format!(
-                        "unknown role in db: {other}"
-                    )))
-                }
+                other => return Err(FerroError::Session(format!("unknown role in db: {other}"))),
             };
-            let content: MessageContent = serde_json::from_str(&content_str)
-                .map_err(FerroError::Serialization)?;
+            let content: MessageContent =
+                serde_json::from_str(&content_str).map_err(FerroError::Serialization)?;
             messages.push(Message { role, content });
         }
 

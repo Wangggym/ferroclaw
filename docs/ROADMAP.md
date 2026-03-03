@@ -21,7 +21,7 @@ ferroclaw 的第一个可用版本必须支持这 4 个能力：
 
 | Phase | 名称 | 交付内容 | 状态 |
 |-------|------|---------|------|
-| **0** | 脚手架 | workspace + CI + `ferroclaw --help` | 🚧 进行中 |
+| **0** | 脚手架 | workspace + CI + `ferroclaw --help` | ✅ 已完成 |
 | **1** | MVP | 4 核心能力（聊天 + 规划 + 记忆 + 命令）| ⏳ |
 | 2 | 多渠道 | Gateway WS + Telegram + Discord | ⏳ |
 | 3 | 工具扩展 | PTY + 浏览器 + 文件工具 | ⏳ |

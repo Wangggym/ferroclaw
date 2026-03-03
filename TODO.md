@@ -12,21 +12,21 @@
 
 **P0-A：Cargo workspace**（不可拆分，其他所有任务的前提）
 
-- [ ] 创建 `Cargo.toml`（workspace，members: `["cli"]`）
-- [ ] 创建 `cli/Cargo.toml`（依赖：`clap`、`tokio`、`tracing`、`tracing-subscriber`、`anyhow`）
-- [ ] `cli/src/main.rs`：`clap` 解析 `--version`/`--help`，初始化 `tracing-subscriber`
-- [ ] 验证：`cargo build` 通过
+- [x] 创建 `Cargo.toml`（workspace，members: `["cli"]`）
+- [x] 创建 `cli/Cargo.toml`（依赖：`clap`、`tokio`、`tracing`、`tracing-subscriber`、`anyhow`）
+- [x] `cli/src/main.rs`：`clap` 解析 `--version`/`--help`，初始化 `tracing-subscriber`
+- [x] 验证：`cargo build` 通过
 
 **P0-B：开发配套**（P0-A 完成后可并行开始）
 
-- [ ] `.gitignore`（`target/`、`.env`、`*.db`）
-- [ ] `.rustfmt.toml`
-- [ ] `Justfile`（`just b`=build，`just t`=test，`just l`=clippy）
+- [x] `.gitignore`（`target/`、`.env`、`*.db`）
+- [x] `.rustfmt.toml`
+- [x] `Justfile`（`just b`=build，`just t`=test，`just l`=clippy）
 
 **P0-C：CI**（P0-A 完成后可开始，与 P0-B 并行）
 
-- [ ] `.github/workflows/ci.yml`：`cargo clippy -- -D warnings` + `cargo test`
-- [ ] 触发：push to main + PR
+- [x] `.github/workflows/ci.yml`：`cargo clippy -- -D warnings` + `cargo test`
+- [x] 触发：push to main + PR
 
 ---
 

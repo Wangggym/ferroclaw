@@ -1,0 +1,15 @@
+[package]
+name = "ferroclaw"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "ferroclaw"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true

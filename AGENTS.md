@@ -8,7 +8,7 @@
 
 - **名称**：ferroclaw（全小写）
 - **定位**：OpenClaw 的 Rust 复刻版，本地优先，单二进制，4 核心能力 MVP
-- **当前状态**：🚧 Phase 0 — 工程脚手架
+- **当前状态**：✅ Phase 0 完成 — 进入 Phase 1 MVP
 
 ---
 
@@ -32,10 +32,50 @@ external/openclaw-main/src/channels/ # 渠道适配器
 
 ---
 
+## 本地开发
+
+```bash
+# 首次初始化（安装 rustfmt / clippy / cargo-watch，生成 .env）
+make gen
+
+# 编辑 .env，填入 API Key
+# FERROCLAW_OPENAI_API_KEY=sk-...
+
+# 启动开发模式（文件变更自动重载）
+make dev
+```
+
+其他常用命令：`make build` / `make test` / `make lint` / `make fix`
+
+> agent 执行编译验证时，优先使用 `make build`；运行测试使用 `make test`。
+> 需要交互测试时用 `make dev`（cargo watch 模式，`Ctrl-C` 停止）。
+
+---
+
+## 完成任务后推送代码
+
+每完成一个任务（或一组相关任务），必须推送代码并创建 PR：
+
+```bash
+# 1. 提交代码
+git add -A
+git commit -m "feat: <简短描述>"
+
+# 2. 使用 /prc 技能创建 PR
+#    在 Cursor 对话中直接说：/prc
+#    agent 会调用 gh CLI 创建 PR，标题 + 描述自动生成
+```
+
+> **规则**：`TODO.md` 标记 `[x]` 之后，必须紧跟一次 `/prc` 推送，不要攒多个任务一起推。
+> 如有 Jira ticket，在 PR 标题开头加 ticket 号，并在 ticket 中添加 PR 链接评论。
+
+---
+
 ## 协作规则
 
 - 认领任务：`[ ]` → `[~] 时间戳`；完成：`[x]`
 - 完成后更新 `TODO.md`，不要让状态过期
+- 完成后立即用 `/prc` 推送 PR（见上方）
 - 实现前先查 OpenClaw 对应 TS 源码（速查表见下方）
 - 不要引入 `03-architecture-and-tech.md` 未列出的重量级依赖
 

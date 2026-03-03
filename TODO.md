@@ -144,31 +144,31 @@ P1-H: CLI 命令收尾（onboard / chat TUI，依赖 P1-E + P1-G）
 可拆分（G1 必须先完成，G2/G3 可并行）：
 
 **G1：存储层**（不可拆分）
-- [ ] 创建 `crates/ferroclaw-memory/`
-- [ ] `sqlite-vec` 扩展集成
-- [ ] `memory_entries(id, content, embedding BLOB, created_at, accessed_at, score)` 表
+- [x] 创建 `crates/ferroclaw-memory/`
+- [x] `sqlite-vec` 扩展集成
+- [x] `memory_entries(id, content, embedding BLOB, created_at, accessed_at, score)` 表
 
 **G2：嵌入客户端**（G1 完成后可与 G3 并行）
-- [ ] `EmbeddingProvider` trait
-- [ ] OpenAI `text-embedding-3-small` 实现
-- [ ] Ollama 嵌入实现（备选）
+- [x] `EmbeddingProvider` trait
+- [x] OpenAI `text-embedding-3-small` 实现
+- [x] Ollama 嵌入实现（备选）
 
-**G3：检索逻辑**（G1 完成后可与 G2 并行）
-- [ ] 余弦相似度检索，top-k 结果
-- [ ] 时间衰减：`score * exp(-0.1 * days_since_access)`
+**G3：检索逻辑**（G1 完成后可与 G3 并行）
+- [x] 余弦相似度检索，top-k 结果
+- [x] 时间衰减：`score * exp(-0.1 * days_since_access)`
 
 **G4：集成**（G2 + G3 完成后）
-- [ ] 对话结束：LLM 提取摘要 → 向量化 → 写入
-- [ ] 对话开始：语义检索 top-5 → 注入 system prompt
-- [ ] `ferroclaw memory list / search "..." / forget <id>` 命令
+- [x] 对话结束：LLM 提取摘要 → 向量化 → 写入
+- [x] 对话开始：语义检索 top-5 → 注入 system prompt
+- [x] `ferroclaw memory list / search "..." / forget <id>` 命令
 
 ---
 
 ### P1-H：CLI 收尾（依赖 P1-G）
 
-- [ ] `ferroclaw onboard`：引导配置 API key + 模型，写入 config.toml
-- [ ] `ferroclaw chat`：`ratatui` TUI，多轮对话（集成 session + memory）
-- [ ] Session 在每次对话后自动保存历史到 SQLite
+- [x] `ferroclaw onboard`：引导配置 API key + 模型，写入 config.toml
+- [x] `ferroclaw chat`：`ratatui` TUI，多轮对话（集成 session + memory）
+- [x] Session 在每次对话后自动保存历史到 SQLite
 
 ---
 

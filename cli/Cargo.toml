@@ -17,3 +17,7 @@ ferroclaw-core.workspace = true
 ferroclaw-agent.workspace = true
 ferroclaw-tools.workspace = true
 ferroclaw-session.workspace = true
+ferroclaw-memory.workspace = true
+serde_json.workspace = true
+ratatui = "0.29"
+crossterm = "0.28"

@@ -36,3 +36,51 @@ pub fn decode_embedding(bytes: &[u8]) -> Vec<f32> {
         .map(|chunk| f32::from_le_bytes(chunk.try_into().unwrap()))
         .collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cosine_similarity_identical_vectors() {
+        let v = vec![1.0f32, 0.0, 0.0];
+        assert!((cosine_similarity(&v, &v) - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn cosine_similarity_orthogonal_vectors() {
+        let a = vec![1.0f32, 0.0, 0.0];
+        let b = vec![0.0f32, 1.0, 0.0];
+        assert!((cosine_similarity(&a, &b) - 0.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn cosine_similarity_zero_vector_returns_zero() {
+        let a = vec![1.0f32, 0.0];
+        let b = vec![0.0f32, 0.0];
+        assert_eq!(cosine_similarity(&a, &b), 0.0);
+    }
+
+    #[test]
+    fn temporal_decay_zero_days_no_change() {
+        let score = apply_temporal_decay(0.8, 0.0);
+        assert!((score - 0.8).abs() < 1e-6);
+    }
+
+    #[test]
+    fn temporal_decay_reduces_score_over_time() {
+        let score_new = apply_temporal_decay(1.0, 0.0);
+        let score_old = apply_temporal_decay(1.0, 30.0);
+        assert!(score_old < score_new);
+    }
+
+    #[test]
+    fn encode_decode_roundtrip() {
+        let original = vec![1.5f32, -0.5, 3.14, 0.0];
+        let encoded = encode_embedding(&original);
+        let decoded = decode_embedding(&encoded);
+        for (a, b) in original.iter().zip(decoded.iter()) {
+            assert!((a - b).abs() < 1e-7, "roundtrip mismatch: {a} vs {b}");
+        }
+    }
+}

@@ -3,6 +3,7 @@ use crate::{
     error::MemoryError,
     search::{apply_temporal_decay, cosine_similarity, decode_embedding, encode_embedding},
 };
+use ferroclaw_core::expand_tilde;
 use sqlx::{migrate::MigrateDatabase, sqlite::SqlitePool, Sqlite};
 use tracing::info;
 use uuid::Uuid;
@@ -25,7 +26,6 @@ impl MemoryManager {
     /// Open (or create) the memory database at the given path.
     pub async fn open(db_url: &str) -> Result<Self, MemoryError> {
         let db_url = expand_tilde(db_url);
-
         if let Some(parent) = std::path::Path::new(&db_url).parent() {
             std::fs::create_dir_all(parent)?;
         }
@@ -152,14 +152,32 @@ impl MemoryManager {
     }
 }
 
-/// Store a memory extracted from a conversation turn, using the LLM summary
-/// and an embedding provider.
+/// Minimum similarity score to consider two entries near-duplicates.
+/// Matches are skipped to avoid storing redundant memories.
+const DEDUP_SIMILARITY_THRESHOLD: f32 = 0.85;
+
+/// Store a memory extracted from a conversation turn.
+/// Skips storage if a near-duplicate already exists (similarity >= DEDUP_SIMILARITY_THRESHOLD).
 pub async fn store_conversation_memory(
     manager: &MemoryManager,
     embedder: &dyn EmbeddingProvider,
     summary: &str,
 ) -> Result<String, MemoryError> {
     let embedding = embedder.embed(summary).await?;
+
+    // Deduplication: check existing entries for near-matches
+    let candidates = manager.search(&embedding, 1).await?;
+    if let Some(top) = candidates.first() {
+        if top.score >= DEDUP_SIMILARITY_THRESHOLD {
+            tracing::debug!(
+                score = top.score,
+                id = %top.id,
+                "skipping near-duplicate memory entry"
+            );
+            return Ok(top.id.clone());
+        }
+    }
+
     manager.store(summary, &embedding).await
 }
 
@@ -182,13 +200,4 @@ pub async fn retrieve_context(
         ctx.push_str(&format!("{}. {}\n", i + 1, entry.content));
     }
     Ok(ctx)
-}
-
-fn expand_tilde(path: &str) -> String {
-    if path.starts_with("~/") {
-        let home = std::env::var("HOME").unwrap_or_else(|_| ".".into());
-        format!("{}{}", home, &path[1..])
-    } else {
-        path.to_owned()
-    }
 }

@@ -113,4 +113,22 @@ impl ConversationHistory {
     pub fn is_empty(&self) -> bool {
         self.messages.is_empty()
     }
+
+    /// Append additional text to the system prompt (first message).
+    /// No-op if the history is empty or the first message is not a system text.
+    pub fn append_to_system_prompt(&mut self, extra: &str) {
+        if let Some(sys) = self.messages.first_mut() {
+            if matches!(sys.role, Role::System) {
+                if let MessageContent::Text(ref mut t) = sys.content {
+                    t.push('\n');
+                    t.push_str(extra);
+                }
+            }
+        }
+    }
+
+    /// Returns a slice of all messages (read-only).
+    pub fn as_slice(&self) -> &[Message] {
+        &self.messages
+    }
 }

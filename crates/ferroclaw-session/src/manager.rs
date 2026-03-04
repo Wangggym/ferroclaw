@@ -1,4 +1,4 @@
-use ferroclaw_core::{FerroError, Message, MessageContent, Role, SessionId};
+use ferroclaw_core::{expand_tilde, FerroError, Message, MessageContent, Role, SessionId};
 use sqlx::{migrate::MigrateDatabase, sqlite::SqlitePool, Sqlite};
 use tracing::info;
 use uuid::Uuid;
@@ -12,13 +12,7 @@ pub struct SessionManager {
 impl SessionManager {
     /// Open (or create) the session database at the given path.
     pub async fn open(db_url: &str) -> Result<Self, FerroError> {
-        // Expand tilde
-        let db_url = if db_url.starts_with("~/") {
-            let home = std::env::var("HOME").unwrap_or_else(|_| ".".into());
-            format!("{}{}", home, &db_url[1..])
-        } else {
-            db_url.to_owned()
-        };
+        let db_url = expand_tilde(db_url);
 
         // Ensure parent directory exists
         if let Some(parent) = std::path::Path::new(&db_url).parent() {

@@ -4,8 +4,8 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use ferroclaw_agent::{AgentConfig, AgentLoop};
 use ferroclaw_agent::{ollama::OllamaProvider, openai::OpenAiProvider};
+use ferroclaw_agent::{AgentConfig, AgentLoop};
 use ferroclaw_core::{ConversationHistory, Message, MessageContent, Role};
 use ferroclaw_session::SessionManager;
 use ferroclaw_tools::{BashExecTool, ToolRegistry};
@@ -20,8 +20,7 @@ use ratatui::{
 use std::io;
 
 use crate::helpers::{
-    build_memory_context, build_system_prompt, require_openai_key, tool_names_str,
-    try_store_memory,
+    build_memory_context, build_system_prompt, require_openai_key, tool_names_str, try_store_memory,
 };
 
 pub struct ChatState {
@@ -98,7 +97,10 @@ pub async fn run_chat(resume_session: Option<String>, no_memory: bool) -> Result
     let mut state = ChatState {
         messages: display,
         input: String::new(),
-        status: format!("Session: {}  (Ctrl-C / Ctrl-D to quit)", session_id.as_str()),
+        status: format!(
+            "Session: {}  (Ctrl-C / Ctrl-D to quit)",
+            session_id.as_str()
+        ),
     };
 
     loop {
@@ -146,16 +148,12 @@ pub async fn run_chat(resume_session: Option<String>, no_memory: bool) -> Result
 
                         match reply_result {
                             Ok(reply) => {
-                                sm.append_message(
-                                    &session_id,
-                                    history.as_slice().last().unwrap(),
-                                )
-                                .await?;
+                                sm.append_message(&session_id, history.as_slice().last().unwrap())
+                                    .await?;
                                 state.messages.push(("assistant".to_owned(), reply.clone()));
 
                                 if !no_memory {
-                                    let summary =
-                                        format!("User: {user_msg}\nAssistant: {reply}");
+                                    let summary = format!("User: {user_msg}\nAssistant: {reply}");
                                     try_store_memory(&cfg, &summary).await;
                                 }
                             }
@@ -233,7 +231,6 @@ pub fn draw_chat(f: &mut ratatui::Frame, state: &ChatState) {
         .wrap(Wrap { trim: false });
     f.render_widget(input, chunks[1]);
 
-    let status =
-        Paragraph::new(state.status.as_str()).style(Style::default().fg(Color::DarkGray));
+    let status = Paragraph::new(state.status.as_str()).style(Style::default().fg(Color::DarkGray));
     f.render_widget(status, chunks[2]);
 }

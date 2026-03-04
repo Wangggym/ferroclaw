@@ -1,6 +1,8 @@
 use anyhow::{Context, Result};
 use ferroclaw_agent::{AgentConfig, LlmBackend};
-use ferroclaw_memory::{retrieve_context, store_conversation_memory, MemoryManager, OpenAiEmbedding};
+use ferroclaw_memory::{
+    retrieve_context, store_conversation_memory, MemoryManager, OpenAiEmbedding,
+};
 use ferroclaw_tools::ToolRegistry;
 
 pub fn tool_names_str(registry: &ToolRegistry) -> String {

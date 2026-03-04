@@ -5,13 +5,8 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 use cmd::{
-    agent::run_agent,
-    chat::run_chat,
-    memory::MemoryCommands,
-    memory::run_memory,
-    onboard::run_onboard,
-    sessions::SessionCommands,
-    sessions::run_sessions,
+    agent::run_agent, chat::run_chat, memory::run_memory, memory::MemoryCommands,
+    onboard::run_onboard, sessions::run_sessions, sessions::SessionCommands,
 };
 
 // ── CLI definition ────────────────────────────────────────────────────────────

@@ -1,6 +1,8 @@
 use anyhow::Result;
 use ferroclaw_agent::provider::LlmChunk;
-use ferroclaw_agent::{ollama::OllamaProvider, openai::OpenAiProvider, AgentConfig, AgentLoop, LlmProvider};
+use ferroclaw_agent::{
+    ollama::OllamaProvider, openai::OpenAiProvider, AgentConfig, AgentLoop, LlmProvider,
+};
 use ferroclaw_core::{ConversationHistory, Message};
 use ferroclaw_tools::{BashExecTool, ToolRegistry};
 use futures_util::{pin_mut, StreamExt};
@@ -65,20 +67,42 @@ pub async fn run_agent(message: String, no_memory: bool) -> Result<()> {
     }
 
     match &provider {
-        ProviderKind::OpenAi { key, model, base_url } => {
+        ProviderKind::OpenAi {
+            key,
+            model,
+            base_url,
+        } => {
             let p = OpenAiProvider::new(key.clone(), model.clone(), base_url.clone());
-            stream_turn(&p, &history, &tools, &mut streamed_text, &mut has_tool_calls).await?;
+            stream_turn(
+                &p,
+                &history,
+                &tools,
+                &mut streamed_text,
+                &mut has_tool_calls,
+            )
+            .await?;
         }
         ProviderKind::Ollama { model, base_url } => {
             let p = OllamaProvider::new(model.clone(), base_url.clone());
-            stream_turn(&p, &history, &tools, &mut streamed_text, &mut has_tool_calls).await?;
+            stream_turn(
+                &p,
+                &history,
+                &tools,
+                &mut streamed_text,
+                &mut has_tool_calls,
+            )
+            .await?;
         }
     }
 
     let final_reply = if has_tool_calls {
         println!();
         let reply = match &provider {
-            ProviderKind::OpenAi { key, model, base_url } => {
+            ProviderKind::OpenAi {
+                key,
+                model,
+                base_url,
+            } => {
                 let p = OpenAiProvider::new(key.clone(), model.clone(), base_url.clone());
                 let agent = AgentLoop::new(&p, &registry, max_steps);
                 agent.run(&mut history).await?

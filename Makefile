@@ -2,13 +2,13 @@ SHELL := /bin/bash
 
 HIDE ?= @
 
-.PHONY: gen build build-release dev run test test-cov check fix lint clean help
+.PHONY: gen build build-release dev run test test-cov check fix lint clean help install-hooks
 
 name := "ferroclaw"
 tag := $(shell git rev-parse --short HEAD 2>/dev/null || echo "dev")
 
 # Initialize Rust development environment
-gen:
+gen: install-hooks
 	@echo "🦀 Initializing ferroclaw development environment..."
 	$(HIDE)rustup update
 	$(HIDE)rustup component add rustfmt clippy
@@ -58,6 +58,15 @@ fix:
 	$(HIDE)cargo fmt
 	@echo "✅ Code formatted."
 
+# Install git pre-commit hook (runs cargo fmt before commit so CI passes)
+install-hooks:
+	@if [ -d .git ]; then \
+		mkdir -p .git/hooks && \
+		cp scripts/pre-commit .git/hooks/pre-commit && \
+		chmod +x .git/hooks/pre-commit && \
+		echo "✅ Pre-commit hook installed (cargo fmt on staged .rs files)."; \
+	fi
+
 # Lint check (CI mode, no fixing)
 lint:
 	$(HIDE)cargo fmt -- --check
@@ -88,6 +97,7 @@ help:
 	@echo "  make check          - cargo check + clippy"
 	@echo "  make fix            - cargo fmt (auto-fix)"
 	@echo "  make lint           - fmt + clippy (CI mode)"
+	@echo "  make install-hooks  - install pre-commit hook (auto fmt before commit)"
 	@echo ""
 	@echo "Utilities:"
 	@echo "  make clean          - Remove build artifacts"
